@@ -1,0 +1,6 @@
+{
+  "name": "Trip Hop: Singapore Outings & Excursion Planner",
+  "description": "Plan group excursions, dates, and corporate team building in Singapore with real-time weather from Data.gov.sg, live Ticketmaster events, transparent pricing, and smart rain-contingency itineraries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
