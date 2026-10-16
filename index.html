@@ -1,6 +1,21 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      // Suppress Vite HMR WebSocket errors in AI Studio preview iframe per environment constraints
+      window.addEventListener('unhandledrejection', function (e) {
+        var str = (e && e.reason && (e.reason.message || e.reason.stack || String(e.reason))) || '';
+        if (str.indexOf('WebSocket') !== -1 || str.indexOf('@vite/client') !== -1) {
+          e.preventDefault();
+        }
+      });
+      window.addEventListener('error', function (e) {
+        var str = ((e && e.message) || '') + ' ' + ((e && e.filename) || '');
+        if (str.indexOf('WebSocket') !== -1 || str.indexOf('@vite/client') !== -1) {
+          e.preventDefault();
+        }
+      });
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Trip Hop: Singapore Outings & Excursion Planner</title>
