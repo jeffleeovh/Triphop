@@ -10,6 +10,7 @@ import { SecondaryItineraryBanner } from './components/SecondaryItineraryBanner.
 import { OutingCard } from './components/OutingCard.tsx';
 import { ItineraryPlanner } from './components/ItineraryPlanner.tsx';
 import { FoursquareDiningSection } from './components/FoursquareDiningSection.tsx';
+import { TalkToUsSection } from './components/TalkToUsSection.tsx';
 import { PaywallModal } from './components/PaywallModal.tsx';
 import { Footer } from './components/Footer.tsx';
 import { SINGAPORE_OUTINGS } from './data/singaporeOutings.ts';
@@ -21,7 +22,7 @@ export default function App() {
   const [selectedAudience, setSelectedAudience] = useState<AudienceType>('Couples');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'explore' | 'itinerary' | 'foursquare'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'itinerary' | 'foursquare' | 'talk'>('explore');
 
   // Paywall state - Lifted to showcase full Family & Corporate feature suite
   const [isSubscriber, setIsSubscriber] = useState<boolean>(true);
@@ -409,6 +410,9 @@ export default function App() {
             persona={selectedAudience}
           />
         )}
+
+        {/* TAB 4: TALK TO US / DISQUS COMMUNITY FORUM */}
+        {activeTab === 'talk' && <TalkToUsSection />}
       </main>
 
       {/* Paywall Modal */}

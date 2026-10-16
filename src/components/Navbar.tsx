@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Users, CloudRain, Sun, Lock, Sparkles, Utensils, Calendar } from 'lucide-react';
+import { Compass, Users, CloudRain, Sun, Lock, Sparkles, Utensils, Calendar, MessageSquare } from 'lucide-react';
 import { AudienceType, LiveWeatherData } from '../types.ts';
 
 interface NavbarProps {
@@ -10,8 +10,8 @@ interface NavbarProps {
   weatherData: LiveWeatherData | null;
   simulatedRain: boolean;
   setSimulatedRain: (sim: boolean) => void;
-  activeTab: 'explore' | 'itinerary' | 'foursquare';
-  setActiveTab: (tab: 'explore' | 'itinerary' | 'foursquare') => void;
+  activeTab: 'explore' | 'itinerary' | 'foursquare' | 'talk';
+  setActiveTab: (tab: 'explore' | 'itinerary' | 'foursquare' | 'talk') => void;
   itineraryCount: number;
   onOpenPaywall: () => void;
   isSubscriber: boolean;
@@ -113,6 +113,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {itineraryCount}
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('talk')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl transition-all ${
+              activeTab === 'talk'
+                ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md shadow-emerald-600/30 font-extrabold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4 text-emerald-600" />
+            <span>Talk to Us</span>
           </button>
         </div>
 
