@@ -14,7 +14,7 @@ import { PaywallModal } from './components/PaywallModal.tsx';
 import { Footer } from './components/Footer.tsx';
 import { SINGAPORE_OUTINGS } from './data/singaporeOutings.ts';
 import { AudienceType, OutingItem, LiveWeatherData } from './types.ts';
-import { Search, Sparkles, Lock, CheckCircle2, Users, Building2, Flame } from 'lucide-react';
+import { Search, Lock, Building2 } from 'lucide-react';
 
 export default function App() {
   const [groupSize, setGroupSize] = useState<number>(2); // Default to 2 (Free for couple)
@@ -50,7 +50,6 @@ export default function App() {
     setWeatherLoading(true);
     setWeatherError(null);
     try {
-      // 1. Pull two-hour weather forecast from serverless endpoint
       const res = await fetch('/api/two-hr-forecast');
       const json = await res.json();
 
@@ -82,7 +81,7 @@ export default function App() {
         rainAreas: rainForecasts.map((f: any) => f.area),
       });
 
-      // 2. Pull PSI air quality data from serverless endpoint
+      // Air Quality from /api/psi
       try {
         const psiRes = await fetch('/api/psi');
         if (psiRes.ok) {
@@ -165,13 +164,12 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-900">
       {/* Top Navigation */}
       <Navbar
         groupSize={groupSize}
         setGroupSize={(size) => {
           setGroupSize(size);
-          // If user moves to 3+ pax or corporate, and hasn't unlocked pass, prompt paywall modal
           if (size >= 3 && !isSubscriber) {
             setIsPaywallOpen(true);
           }
@@ -215,33 +213,33 @@ export default function App() {
           <div className="space-y-8">
             {/* Paywall Banner for Families & Corporate */}
             {isPaywalled && (
-              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-teal-950/40 border-2 border-emerald-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50 border-2 border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
                 <div className="flex items-start gap-3.5">
-                  <div className="p-2.5 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex-shrink-0">
+                  <div className="p-2.5 rounded-2xl bg-amber-100 text-amber-800 border border-amber-300 flex-shrink-0">
                     <Lock className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-display font-extrabold text-lg text-white">
+                    <h3 className="font-display font-extrabold text-lg text-slate-900">
                       Free For Couples (Up to 2 Pax) • Party of {groupSize} Requires Pass
                     </h3>
-                    <p className="text-sm text-slate-300 mt-0.5">
+                    <p className="text-sm text-slate-600 mt-0.5">
                       Families with 3+ persons and Corporate groups unlock unlimited custom itinerary creation, split pricing, and team challenges.
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsPaywallOpen(true)}
-                  className="flex-shrink-0 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:brightness-110 text-slate-950 font-extrabold text-sm shadow-md transition-all active:scale-95"
+                  className="flex-shrink-0 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-sm shadow-md transition-all active:scale-95"
                 >
                   View Pass Options
                 </button>
               </div>
             )}
 
-            {/* Travel Party Persona Selector (Bigger text & vibrant pills) */}
-            <div className="p-6 rounded-3xl bg-slate-900/90 border-2 border-slate-800 space-y-4 shadow-xl">
+            {/* Travel Party Persona Selector */}
+            <div className="p-6 rounded-3xl bg-white border-2 border-slate-200 space-y-4 shadow-sm">
               <div>
-                <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-emerald-400 block mb-2">
+                <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-emerald-800 block mb-2">
                   1. Select Travel Persona (Freemium Tier Aware)
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -252,14 +250,14 @@ export default function App() {
                     }}
                     className={`p-3.5 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                       selectedAudience === 'Couples' && groupSize <= 2
-                        ? 'bg-emerald-500/20 border-emerald-400 text-white shadow-lg shadow-emerald-950/40'
-                        : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700'
+                        ? 'bg-emerald-50 border-emerald-500 text-slate-900 shadow-md'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <span className="font-display font-extrabold text-base text-white">
+                    <span className="font-display font-extrabold text-base text-slate-900">
                       💑 Couples / Duos
                     </span>
-                    <span className="text-xs font-bold text-emerald-400 mt-1">
+                    <span className="text-xs font-bold text-emerald-700 mt-1">
                       FREE (Up to 2 Pax)
                     </span>
                   </button>
@@ -272,14 +270,14 @@ export default function App() {
                     }}
                     className={`p-3.5 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                       selectedAudience === 'Families'
-                        ? 'bg-amber-500/20 border-amber-400 text-white shadow-lg shadow-amber-950/40'
-                        : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700'
+                        ? 'bg-amber-50 border-amber-400 text-slate-900 shadow-md'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <span className="font-display font-extrabold text-base text-white">
+                    <span className="font-display font-extrabold text-base text-slate-900">
                       👨‍👩‍👧‍👦 Families (3+)
                     </span>
-                    <span className="text-xs font-bold text-amber-300 mt-1">
+                    <span className="text-xs font-bold text-amber-700 mt-1">
                       Family Pass ($4.99/mo)
                     </span>
                   </button>
@@ -292,14 +290,14 @@ export default function App() {
                     }}
                     className={`p-3.5 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                       selectedAudience === 'Friends'
-                        ? 'bg-purple-500/20 border-purple-400 text-white shadow-lg shadow-purple-950/40'
-                        : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700'
+                        ? 'bg-purple-50 border-purple-400 text-slate-900 shadow-md'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <span className="font-display font-extrabold text-base text-white">
+                    <span className="font-display font-extrabold text-base text-slate-900">
                       👥 Friend Groups
                     </span>
-                    <span className="text-xs font-bold text-purple-300 mt-1">
+                    <span className="text-xs font-bold text-purple-700 mt-1">
                       Group Pass ($4.99/mo)
                     </span>
                   </button>
@@ -313,15 +311,15 @@ export default function App() {
                     }}
                     className={`p-3.5 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                       selectedAudience === 'Corporate'
-                        ? 'bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-cyan-400 text-white shadow-lg shadow-cyan-950/40'
-                        : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700'
+                        ? 'bg-cyan-50 border-cyan-400 text-slate-900 shadow-md'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <span className="font-display font-extrabold text-base text-white flex items-center gap-1.5">
-                      <Building2 className="w-4 h-4 text-cyan-400" />
+                    <span className="font-display font-extrabold text-base text-slate-900 flex items-center gap-1.5">
+                      <Building2 className="w-4 h-4 text-cyan-600" />
                       🏢 Corporate Teams
                     </span>
-                    <span className="text-xs font-bold text-cyan-300 mt-1">
+                    <span className="text-xs font-bold text-cyan-700 mt-1">
                       Corporate Pass ($29)
                     </span>
                   </button>
@@ -329,7 +327,7 @@ export default function App() {
               </div>
 
               {/* Search & Category Pills */}
-              <div className="flex flex-col md:flex-row gap-3 pt-3 border-t-2 border-slate-800/80">
+              <div className="flex flex-col md:flex-row gap-3 pt-3 border-t-2 border-slate-100">
                 <div className="relative flex-1">
                   <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
@@ -337,7 +335,7 @@ export default function App() {
                     placeholder="Search Singapore excursions (e.g. iFly, Lost SG, Sentosa, Jewel)..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-950 border-2 border-slate-800 rounded-2xl pl-12 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400"
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl pl-12 pr-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white"
                   />
                 </div>
 
@@ -348,8 +346,8 @@ export default function App() {
                       onClick={() => setSelectedCategory(cat)}
                       className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold whitespace-nowrap transition-all border-2 ${
                         selectedCategory === cat
-                          ? 'bg-slate-800 text-emerald-300 border-emerald-400 shadow-md'
-                          : 'bg-slate-950/60 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:text-slate-900'
                       }`}
                     >
                       {cat === 'Team Building & Adventure' ? '🔥 Team Building & Adventure' : cat}
@@ -362,15 +360,15 @@ export default function App() {
             {/* Activities Grid Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-display font-extrabold text-2xl text-white">
+                <h2 className="font-display font-extrabold text-2xl text-slate-900">
                   Curated Singapore Activities &amp; Outings
                 </h2>
-                <p className="text-sm text-slate-300 mt-0.5">
+                <p className="text-sm text-slate-600 mt-0.5">
                   Pricing dynamically scaled for <strong>{groupSize} pax</strong> ({selectedAudience})
                 </p>
               </div>
 
-              <span className="text-sm font-mono font-extrabold text-emerald-300 bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/30">
+              <span className="text-sm font-mono font-extrabold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-xl border border-emerald-300">
                 {filteredOutings.length} Curated Options
               </span>
             </div>
@@ -390,7 +388,7 @@ export default function App() {
             </div>
 
             {filteredOutings.length === 0 && (
-              <div className="p-16 text-center rounded-3xl bg-slate-900/40 border-2 border-slate-800 text-slate-300 text-sm">
+              <div className="p-16 text-center rounded-3xl bg-white border-2 border-slate-200 text-slate-600 text-sm">
                 No activities found matching your search. Try switching categories or clearing search keywords.
               </div>
             )}
