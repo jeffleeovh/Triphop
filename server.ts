@@ -8,6 +8,7 @@ import psiHandler from './api/psi.ts';
 import healthHandler from './api/health.ts';
 import placesHandler from './api/places.ts';
 import exchangeRatesHandler from './api/exchangerates.ts';
+import foursquareHandler from './api/foursquare.ts';
 
 dotenv.config();
 
@@ -21,6 +22,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serverless API handlers in root /api/ folder
+app.all('/api/foursquare/:fsq_place_id?', (req: Request, res: Response) => {
+  return foursquareHandler(req, res);
+});
+
 app.all('/api/places/:fsq_place_id?', (req: Request, res: Response) => {
   return placesHandler(req, res);
 });
@@ -54,11 +59,6 @@ app.get('/api/weather', (req: Request, res: Response) => {
   return twoHrForecastHandler(req, res);
 });
 
-app.get('/api/foursquare', (req: Request, res: Response) => {
-  req.query.type = 'foursquare';
-  return tripHopHandler(req, res);
-});
-
 app.get('/api/restaurants', (req: Request, res: Response) => {
   req.query.type = 'foursquare';
   return tripHopHandler(req, res);
@@ -67,9 +67,10 @@ app.get('/api/restaurants', (req: Request, res: Response) => {
 // Overall server status
 app.get('/api/status', (_req: Request, res: Response) => {
   res.json({
-    app: 'Trip Hop & MAS Exchanger',
+    app: 'Trip Hop & Foursquare API Gateway',
     status: 'online',
     endpoints: {
+      foursquare: '/api/foursquare?fsq_place_id={fsq_place_id}',
       places: '/api/places?fsq_place_id={fsq_place_id}',
       exchangeRates: '/api/exchangerates',
       twoHourForecast: '/api/two-hr-forecast',
@@ -79,8 +80,8 @@ app.get('/api/status', (_req: Request, res: Response) => {
       tripHop: '/api/trip-hop',
     },
     keyConfigured: {
-      masKeyId: Boolean(process.env.MAS_KEY_ID),
       foursquareApiKey: Boolean(process.env.FOURSQUARE_API_KEY),
+      masKeyId: Boolean(process.env.MAS_KEY_ID),
     },
   });
 });
@@ -104,7 +105,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Trip Hop & MAS Exchanger] Server running on http://0.0.0.0:${PORT}`);
+    console.log(`[Trip Hop & Foursquare API Gateway] Server running on http://0.0.0.0:${PORT}`);
   });
 }
 
