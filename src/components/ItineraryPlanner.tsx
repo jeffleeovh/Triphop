@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Clock, MapPin, Share2, Check, ShieldCheck, AlertTriangle, Lock, Sparkles } from 'lucide-react';
+import { Trash2, Clock, MapPin, Share2, Check, ShieldCheck, AlertTriangle, Building2, Users, Receipt, FileText, Award, Baby } from 'lucide-react';
 import { OutingItem } from '../types.ts';
 
 interface ItineraryPlannerProps {
@@ -12,6 +12,7 @@ interface ItineraryPlannerProps {
   onSwitchToSecondary: () => void;
   isPaywalled: boolean;
   onOpenPaywall: () => void;
+  persona: string;
 }
 
 export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
@@ -22,26 +23,31 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
   isRain,
   isSecondaryActive,
   onSwitchToSecondary,
-  isPaywalled,
-  onOpenPaywall,
+  persona,
 }) => {
   const [copied, setCopied] = useState<boolean>(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
+  const [companyName, setCompanyName] = useState<string>('Acme Global Singapore');
+  const [teamLeader, setTeamLeader] = useState<string>('Alex Tan');
 
   // Financial calculations
   const activitiesSubtotalPerPax = items.reduce((sum, item) => sum + item.pricePerPax, 0);
   const activitiesSubtotalTotal = activitiesSubtotalPerPax * groupSize;
   const estimatedFoodPerPax = 22; // Avg Singapore hawker/satay feast
   const totalFoodBudget = estimatedFoodPerPax * groupSize;
-  const grandTotal = activitiesSubtotalTotal + totalFoodBudget;
+  const subtotalBeforeTax = activitiesSubtotalTotal + totalFoodBudget;
+  const gstTax = Math.round(subtotalBeforeTax * 0.09); // Singapore 9% GST
+  const grandTotal = subtotalBeforeTax + gstTax;
   const grandTotalPerPax = Math.round(grandTotal / groupSize);
 
   const outdoorItemsUnderRain = isRain ? items.filter((i) => i.type === 'outdoor') : [];
 
   const handleShare = () => {
-    const text = `🇸🇬 Trip Hop Singapore Outing Plan (${groupSize} pax)\n` +
-      `Estimated Cost: S$${grandTotal} (S$${grandTotalPerPax}/pax)\n\n` +
+    const text = `🇸🇬 Trip Hop Singapore Outing Plan (${groupSize} pax - ${persona})\n` +
+      `Grand Total: S$${grandTotal} (S$${grandTotalPerPax}/pax incl. 9% GST)\n\n` +
+      `Activities:\n` +
       items.map((it, idx) => `${idx + 1}. ${it.name} - S$${it.pricePerPax}/pax (${it.area})`).join('\n') +
-      `\n\nGenerated with Trip Hop • Data: Data.gov.sg & Foursquare`;
+      `\n\nGenerated with Trip Hop Singapore • Data: Data.gov.sg & Foursquare`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -66,29 +72,105 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Paywall Alert Banner */}
-      {isPaywalled && (
-        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-50 via-orange-50/50 to-amber-50 border-2 border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-          <div className="flex items-start gap-3.5">
-            <div className="p-2.5 rounded-2xl bg-amber-100 text-amber-800 border border-amber-300 flex-shrink-0">
-              <Lock className="w-6 h-6" />
+      {/* Unlocked Premium Suite Banner for Family & Corporate */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-2 border-emerald-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start gap-3.5">
+          <div className="p-2.5 rounded-2xl bg-emerald-600 text-white shadow-md flex-shrink-0">
+            {persona === 'Corporate' ? <Building2 className="w-6 h-6" /> : <Users className="w-6 h-6" />}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-950">
+                Unlocked Feature Suite
+              </span>
+              <span className="text-xs font-bold text-slate-700">
+                Party of {groupSize} ({persona})
+              </span>
+            </div>
+            <h4 className="font-display font-extrabold text-lg text-slate-900 mt-0.5">
+              {persona === 'Corporate'
+                ? 'Corporate Team Building & HR Expense Toolkit Active'
+                : 'Family & Group Coordination Suite Active'}
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+              Full access to itemized tax invoicing, team role assignments, kid discounts, and live rain contingency planning.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={() => setShowInvoiceModal(!showInvoiceModal)}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border-2 border-emerald-300 font-extrabold text-xs shadow-xs transition-all active:scale-95"
+          >
+            <Receipt className="w-4 h-4 text-emerald-600" />
+            <span>{showInvoiceModal ? 'Hide HR Invoice' : 'Generate HR Tax Invoice'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* HR Invoice Preview Drawer / Section if toggled */}
+      {showInvoiceModal && (
+        <div className="p-6 sm:p-8 rounded-3xl bg-white border-2 border-slate-300 shadow-xl space-y-4 animate-fadeIn">
+          <div className="flex items-center justify-between pb-4 border-b-2 border-slate-200">
+            <div>
+              <span className="text-xs font-mono font-bold text-slate-500 uppercase">
+                Official Outing Quotation / Tax Invoice
+              </span>
+              <h3 className="font-display font-extrabold text-xl text-slate-900 mt-0.5">
+                Trip Hop Corporate Outing Invoice #TH-SG-2026-089
+              </h3>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+              Tax Invoice Ready
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-700">
+            <div>
+              <span className="font-bold block text-slate-900">Billed To Organization:</span>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="mt-1 px-3 py-1.5 rounded-xl border border-slate-300 w-full font-medium text-slate-900"
+              />
             </div>
             <div>
-              <h4 className="font-display font-extrabold text-lg text-slate-900">
-                Family &amp; Corporate Outing Gated (Party of {groupSize})
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                Couples (up to 2 pax) are free. Parties of 3+ require a Family or Corporate Pass to export and coordinate.
-              </p>
+              <span className="font-bold block text-slate-900">Assigned Team Lead / POC:</span>
+              <input
+                type="text"
+                value={teamLeader}
+                onChange={(e) => setTeamLeader(e.target.value)}
+                className="mt-1 px-3 py-1.5 rounded-xl border border-slate-300 w-full font-medium text-slate-900"
+              />
+            </div>
+            <div>
+              <span className="font-bold block text-slate-900">Corporate Party Headcount:</span>
+              <div className="mt-1 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 font-bold text-slate-900">
+                {groupSize} Confirmed Employees
+              </div>
             </div>
           </div>
-          <button
-            onClick={onOpenPaywall}
-            className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Unlock Pass / Demo</span>
-          </button>
+
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs font-mono">
+            <div className="flex justify-between text-slate-700">
+              <span>Subtotal Activities ({items.length} events × {groupSize} pax):</span>
+              <span className="font-bold">S${activitiesSubtotalTotal}.00</span>
+            </div>
+            <div className="flex justify-between text-slate-700">
+              <span>F&amp;B Catering Allowance (S$22/pax):</span>
+              <span className="font-bold">S${totalFoodBudget}.00</span>
+            </div>
+            <div className="flex justify-between text-slate-700">
+              <span>Singapore Goods &amp; Services Tax (9% GST):</span>
+              <span className="font-bold">S${gstTax}.00</span>
+            </div>
+            <div className="pt-2 border-t border-slate-300 flex justify-between font-bold text-sm text-slate-900">
+              <span>Total Invoice Amount (SGD):</span>
+              <span className="text-emerald-700 text-base">S${grandTotal}.00</span>
+            </div>
+          </div>
         </div>
       )}
 
@@ -131,7 +213,7 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
               )}
             </div>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 mt-1">
-              Singapore Excursion Plan ({groupSize} Pax)
+              Singapore Excursion Plan ({groupSize} Pax - {persona})
             </h2>
           </div>
 
@@ -163,9 +245,16 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
                     {index + 1}
                   </div>
                   <div className="min-w-0">
-                    <h4 className="font-display font-extrabold text-base sm:text-lg text-slate-900 truncate group-hover:text-emerald-700 transition-colors">
-                      {item.name}
-                    </h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-display font-extrabold text-base sm:text-lg text-slate-900 truncate group-hover:text-emerald-700 transition-colors">
+                        {item.name}
+                      </h4>
+                      {item.isTeamBuildingFavorite && (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-200">
+                          Team Favorite
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mt-1">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-emerald-600" />
@@ -205,7 +294,7 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
           <div className="p-6 rounded-3xl bg-slate-50 border-2 border-slate-200 space-y-3">
             <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-600 flex items-center justify-between">
               <span>Transparent Cost Breakdown</span>
-              <span className="text-emerald-700 font-bold">No Hidden Fees</span>
+              <span className="text-emerald-700 font-bold">Includes 9% GST &amp; Group Discounts</span>
             </div>
 
             <div className="flex justify-between text-sm text-slate-700 font-mono">
@@ -216,6 +305,11 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
             <div className="flex justify-between text-sm text-slate-600 font-mono">
               <span>Estimated Hawker &amp; Satay Dining (S$22/pax):</span>
               <span>S${totalFoodBudget}</span>
+            </div>
+
+            <div className="flex justify-between text-sm text-slate-600 font-mono">
+              <span>Estimated 9% GST:</span>
+              <span>S${gstTax}</span>
             </div>
 
             <div className="pt-4 border-t-2 border-slate-200 flex justify-between items-baseline font-mono">

@@ -23,12 +23,11 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'explore' | 'itinerary' | 'foursquare'>('explore');
 
-  // Paywall state
-  // Free for couple or 2 person. Families (more than 3) or corporate behind paywall.
-  const [isSubscriber, setIsSubscriber] = useState<boolean>(false);
+  // Paywall state - Lifted to showcase full Family & Corporate feature suite
+  const [isSubscriber, setIsSubscriber] = useState<boolean>(true);
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false);
 
-  const isPaywalled = (groupSize >= 3 || selectedAudience === 'Corporate') && !isSubscriber;
+  const isPaywalled = false;
 
   // Itinerary state
   const [itineraryItems, setItineraryItems] = useState<OutingItem[]>([
@@ -266,11 +265,10 @@ export default function App() {
                     onClick={() => {
                       setSelectedAudience('Families');
                       setGroupSize(4);
-                      if (!isSubscriber) setIsPaywallOpen(true);
                     }}
                     className={`p-3.5 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                       selectedAudience === 'Families'
-                        ? 'bg-amber-50 border-amber-400 text-slate-900 shadow-md'
+                        ? 'bg-amber-50 border-amber-400 text-slate-900 shadow-md ring-2 ring-amber-300'
                         : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                     }`}
                   >
@@ -278,7 +276,7 @@ export default function App() {
                       👨‍👩‍👧‍👦 Families (3+)
                     </span>
                     <span className="text-xs font-bold text-amber-700 mt-1">
-                      Family Pass ($4.99/mo)
+                      Features Unlocked
                     </span>
                   </button>
 
@@ -286,11 +284,10 @@ export default function App() {
                     onClick={() => {
                       setSelectedAudience('Friends');
                       setGroupSize(5);
-                      if (!isSubscriber) setIsPaywallOpen(true);
                     }}
                     className={`p-3.5 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                       selectedAudience === 'Friends'
-                        ? 'bg-purple-50 border-purple-400 text-slate-900 shadow-md'
+                        ? 'bg-purple-50 border-purple-400 text-slate-900 shadow-md ring-2 ring-purple-300'
                         : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                     }`}
                   >
@@ -298,7 +295,7 @@ export default function App() {
                       👥 Friend Groups
                     </span>
                     <span className="text-xs font-bold text-purple-700 mt-1">
-                      Group Pass ($4.99/mo)
+                      Features Unlocked
                     </span>
                   </button>
 
@@ -307,11 +304,10 @@ export default function App() {
                       setSelectedAudience('Corporate');
                       setGroupSize(12);
                       setSelectedCategory('Team Building & Adventure');
-                      if (!isSubscriber) setIsPaywallOpen(true);
                     }}
                     className={`p-3.5 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                       selectedAudience === 'Corporate'
-                        ? 'bg-cyan-50 border-cyan-400 text-slate-900 shadow-md'
+                        ? 'bg-cyan-50 border-cyan-400 text-slate-900 shadow-md ring-2 ring-cyan-300'
                         : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                     }`}
                   >
@@ -320,7 +316,7 @@ export default function App() {
                       🏢 Corporate Teams
                     </span>
                     <span className="text-xs font-bold text-cyan-700 mt-1">
-                      Corporate Pass ($29)
+                      HR Suite Unlocked
                     </span>
                   </button>
                 </div>
@@ -364,7 +360,7 @@ export default function App() {
                   Curated Singapore Activities &amp; Outings
                 </h2>
                 <p className="text-sm text-slate-600 mt-0.5">
-                  Pricing dynamically scaled for <strong>{groupSize} pax</strong> ({selectedAudience})
+                  Pricing dynamically scaled for <strong>{groupSize} pax</strong> ({selectedAudience}) • All features unlocked
                 </p>
               </div>
 
@@ -408,8 +404,9 @@ export default function App() {
             isRain={isRain}
             isSecondaryActive={isSecondaryActive}
             onSwitchToSecondary={handleActivateSecondary}
-            isPaywalled={isPaywalled}
+            isPaywalled={false}
             onOpenPaywall={() => setIsPaywallOpen(true)}
+            persona={selectedAudience}
           />
         )}
       </main>

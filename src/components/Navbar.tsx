@@ -167,29 +167,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Paywall Tier Button */}
+          {/* Feature Suite Status */}
           <button
             onClick={onOpenPaywall}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 text-xs font-extrabold transition-all shadow-sm ${
-              groupSize <= 2
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                : isSubscriber
-                ? 'bg-teal-50 border-teal-300 text-teal-800'
-                : 'bg-amber-100 border-amber-400 text-amber-900 animate-pulse'
-            }`}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border-2 border-emerald-300 bg-emerald-50 text-emerald-900 text-xs font-extrabold shadow-xs transition-all hover:bg-emerald-100"
+            title="View tier specs and details"
           >
-            {groupSize <= 2 ? (
-              <span>Couples: FREE</span>
-            ) : isSubscriber ? (
-              <span className="flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-                Pass Unlocked
-              </span>
-            ) : (
-              <span className="flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5 text-amber-700" />
-                Pass Required
-              </span>
-            )}
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Family &amp; Corporate Unlocked</span>
           </button>
         </div>
       </div>
