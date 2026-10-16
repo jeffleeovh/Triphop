@@ -6,6 +6,8 @@ import tripHopHandler from './api/trip-hop.ts';
 import twoHrForecastHandler from './api/two-hr-forecast.ts';
 import psiHandler from './api/psi.ts';
 import healthHandler from './api/health.ts';
+import placesHandler from './api/places.ts';
+import exchangeRatesHandler from './api/exchangerates.ts';
 
 dotenv.config();
 
@@ -18,7 +20,15 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serverless API handlers in /api/
+// Serverless API handlers in root /api/ folder
+app.all('/api/places/:fsq_place_id?', (req: Request, res: Response) => {
+  return placesHandler(req, res);
+});
+
+app.all('/api/exchangerates', (req: Request, res: Response) => {
+  return exchangeRatesHandler(req, res);
+});
+
 app.all('/api/two-hr-forecast', (req: Request, res: Response) => {
   return twoHrForecastHandler(req, res);
 });
@@ -57,19 +67,20 @@ app.get('/api/restaurants', (req: Request, res: Response) => {
 // Overall server status
 app.get('/api/status', (_req: Request, res: Response) => {
   res.json({
-    app: 'Trip Hop',
+    app: 'Trip Hop & MAS Exchanger',
     status: 'online',
     endpoints: {
+      places: '/api/places?fsq_place_id={fsq_place_id}',
+      exchangeRates: '/api/exchangerates',
       twoHourForecast: '/api/two-hr-forecast',
       psi: '/api/psi',
       health: '/api/health',
       heath: '/api/heath',
       tripHop: '/api/trip-hop',
     },
-    dataGovSgEndpoints: {
-      twoHrForecast: 'https://api-open.data.gov.sg/v2/real-time/api/two-hr-forecast',
-      psi: 'https://api-open.data.gov.sg/v2/real-time/api/psi',
-      apiKeyRequired: false,
+    keyConfigured: {
+      masKeyId: Boolean(process.env.MAS_KEY_ID),
+      foursquareApiKey: Boolean(process.env.FOURSQUARE_API_KEY),
     },
   });
 });
@@ -93,7 +104,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Trip Hop] Server running on http://0.0.0.0:${PORT}`);
+    console.log(`[Trip Hop & MAS Exchanger] Server running on http://0.0.0.0:${PORT}`);
   });
 }
 
