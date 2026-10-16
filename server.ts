@@ -9,6 +9,7 @@ import healthHandler from './api/health.ts';
 import placesHandler from './api/places.ts';
 import exchangeRatesHandler from './api/exchangerates.ts';
 import foursquareHandler from './api/foursquare.ts';
+import geminiFoodHandler from './api/gemini-food.ts';
 
 dotenv.config();
 
@@ -22,6 +23,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serverless API handlers in root /api/ folder
+app.all('/api/gemini/food-spaces', (req: Request, res: Response) => {
+  return geminiFoodHandler(req, res);
+});
+
+app.all('/api/food', (req: Request, res: Response) => {
+  return geminiFoodHandler(req, res);
+});
+
 app.all('/api/foursquare/:fsq_place_id?', (req: Request, res: Response) => {
   return foursquareHandler(req, res);
 });
@@ -67,9 +76,10 @@ app.get('/api/restaurants', (req: Request, res: Response) => {
 // Overall server status
 app.get('/api/status', (_req: Request, res: Response) => {
   res.json({
-    app: 'Trip Hop & Foursquare API Gateway',
+    app: 'Trip Hop & Gemini Food Intelligence',
     status: 'online',
     endpoints: {
+      geminiFoodSpaces: '/api/gemini/food-spaces',
       foursquare: '/api/foursquare?fsq_place_id={fsq_place_id}',
       places: '/api/places?fsq_place_id={fsq_place_id}',
       exchangeRates: '/api/exchangerates',
@@ -80,6 +90,7 @@ app.get('/api/status', (_req: Request, res: Response) => {
       tripHop: '/api/trip-hop',
     },
     keyConfigured: {
+      geminiApiKey: Boolean(process.env.GEMINI_API_KEY),
       foursquareApiKey: Boolean(process.env.FOURSQUARE_API_KEY),
       masKeyId: Boolean(process.env.MAS_KEY_ID),
     },
@@ -105,7 +116,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Trip Hop & Foursquare API Gateway] Server running on http://0.0.0.0:${PORT}`);
+    console.log(`[Trip Hop] Server running on http://0.0.0.0:${PORT}`);
   });
 }
 
