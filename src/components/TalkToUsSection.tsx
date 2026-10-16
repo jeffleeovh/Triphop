@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MessageSquare, Users, Sparkles, Send, ShieldCheck, HeartHandshake, HelpCircle } from 'lucide-react';
 import { DiscussionEmbed, CommentCount } from 'disqus-react';
+import { DisqusErrorBoundary } from './DisqusErrorBoundary.tsx';
 
 export const TalkToUsSection: React.FC = () => {
   const [activeTopic, setActiveTopic] = useState<'general' | 'teambuilding' | 'weather'>('general');
@@ -51,9 +52,11 @@ export const TalkToUsSection: React.FC = () => {
                   Disqus Community
                 </span>
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  <CommentCount shortname={disqusShortname} config={disqusConfig}>
-                    Comments
-                  </CommentCount>
+                  <DisqusErrorBoundary>
+                    <CommentCount shortname={disqusShortname} config={disqusConfig}>
+                      Comments
+                    </CommentCount>
+                  </DisqusErrorBoundary>
                 </span>
               </div>
               <p className="text-sm text-slate-600 mt-1 max-w-2xl">
@@ -129,11 +132,13 @@ export const TalkToUsSection: React.FC = () => {
 
       {/* Disqus Discussion Embed */}
       <div className="p-6 sm:p-8 rounded-3xl bg-white border-2 border-slate-200 shadow-xl min-h-[400px]">
-        <DiscussionEmbed
-          key={currentTopic.id}
-          shortname={disqusShortname}
-          config={disqusConfig}
-        />
+        <DisqusErrorBoundary>
+          <DiscussionEmbed
+            key={currentTopic.id}
+            shortname={disqusShortname}
+            config={disqusConfig}
+          />
+        </DisqusErrorBoundary>
       </div>
     </div>
   );
