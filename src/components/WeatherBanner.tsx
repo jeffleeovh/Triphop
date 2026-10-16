@@ -4,6 +4,7 @@ import { LiveWeatherData } from '../types.ts';
 
 interface WeatherBannerProps {
   weatherData: LiveWeatherData | null;
+  psiData?: { centralPsi: number; descriptor: string } | null;
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
@@ -12,6 +13,7 @@ interface WeatherBannerProps {
 
 export const WeatherBanner: React.FC<WeatherBannerProps> = ({
   weatherData,
+  psiData,
   loading,
   error,
   onRefresh,
@@ -67,6 +69,11 @@ export const WeatherBanner: React.FC<WeatherBannerProps> = ({
               <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-emerald-400 border border-emerald-500/30">
                 Official Government API
               </span>
+              {psiData && (
+                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
+                  PSI {psiData.centralPsi} ({psiData.descriptor})
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-300 font-medium mt-0.5">
               {weatherData?.validPeriod?.text

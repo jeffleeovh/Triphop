@@ -41,6 +41,14 @@ export interface LiveWeatherData {
   rawMessage?: string;
 }
 
+export interface LivePsiData {
+  status: 'ok' | 'error';
+  twentyFourHourly?: Record<string, number>;
+  nationalPsi?: number;
+  descriptor?: string;
+  updateTimestamp?: string;
+}
+
 export interface FoursquareRestaurant {
   id: string;
   name: string;

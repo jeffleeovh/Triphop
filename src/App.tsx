@@ -38,18 +38,20 @@ export default function App() {
   ]);
   const [isSecondaryActive, setIsSecondaryActive] = useState<boolean>(false);
 
-  // Live Weather state from Data.gov.sg
+  // Live Weather & PSI state from Data.gov.sg
   const [weatherData, setWeatherData] = useState<LiveWeatherData | null>(null);
+  const [psiData, setPsiData] = useState<any | null>(null);
   const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
   const [weatherError, setWeatherError] = useState<string | null>(null);
   const [simulatedRain, setSimulatedRain] = useState<boolean>(false);
 
-  // Fetch real-time weather from Data.gov.sg via serverless route
+  // Fetch real-time weather from /api/two-hr-forecast and PSI from /api/psi
   const fetchWeather = async () => {
     setWeatherLoading(true);
     setWeatherError(null);
     try {
-      const res = await fetch('/api/trip-hop?type=weather');
+      // 1. Pull two-hour weather forecast from serverless endpoint
+      const res = await fetch('/api/two-hr-forecast');
       const json = await res.json();
 
       if (!res.ok) {
@@ -79,6 +81,24 @@ export default function App() {
         isRainDetected: rainForecasts.length > 0,
         rainAreas: rainForecasts.map((f: any) => f.area),
       });
+
+      // 2. Pull PSI air quality data from serverless endpoint
+      try {
+        const psiRes = await fetch('/api/psi');
+        if (psiRes.ok) {
+          const psiJson = await psiRes.json();
+          const readings = psiJson?.data?.items?.[0]?.readings;
+          if (readings) {
+            const centralPsi = readings['psi_twenty_four_hourly']?.central || 45;
+            setPsiData({
+              centralPsi,
+              descriptor: centralPsi <= 50 ? 'Good' : centralPsi <= 100 ? 'Moderate' : 'Unhealthy',
+            });
+          }
+        }
+      } catch {
+        // Non-critical
+      }
     } catch (err: any) {
       setWeatherError(err?.message || 'Unable to connect to Data.gov.sg API');
     } finally {
@@ -172,6 +192,7 @@ export default function App() {
         {/* Real-Time Weather from Data.gov.sg */}
         <WeatherBanner
           weatherData={weatherData}
+          psiData={psiData}
           loading={weatherLoading}
           error={weatherError}
           onRefresh={fetchWeather}
